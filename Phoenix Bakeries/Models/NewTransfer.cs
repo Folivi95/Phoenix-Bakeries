@@ -17,6 +17,8 @@ namespace Phoenix_Bakeries.Models
         public int AccountNumber { get; set; }
         [Display(Name = "Bank Name"), Required]
         public string BankCode { get; set; }
+        [Display(Name = "Amount")]
+        public int Amount { get; set; }
         public string Currency { get; set; }
     }
 }
