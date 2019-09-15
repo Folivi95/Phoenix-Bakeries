@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Phoenix_Bakeries.Models;
 
 namespace Phoenix_Bakeries.Models
 {
@@ -14,5 +15,7 @@ namespace Phoenix_Bakeries.Models
         }
 
         public DbSet<Phoenix_Bakeries.Models.Transfer> Transfer { get; set; }
+
+        public DbSet<Phoenix_Bakeries.Models.NewTransfer> NewTransfer { get; set; }
     }
 }
