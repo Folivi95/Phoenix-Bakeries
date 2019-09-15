@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <RootNamespace>Phoenix_Bakeries</RootNamespace>
+    <RootNamespace>PhoenixBakeries</RootNamespace>
     <UserSecretsId>33ac17e6-c780-4a06-b3d2-364b0c8cc72c</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>

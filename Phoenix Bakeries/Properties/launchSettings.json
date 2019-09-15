@@ -13,7 +13,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "secretKey": "sk_test_f075718722a05eb8182c77beb0279ebe1d2249d2",
-        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_ENVIRONMENT": "Production",
         "publicKey": "pk_test_2d8c8cc28b9fe655ef88e292cf66c3e9cb7dff08"
       }
     },
@@ -21,7 +21,9 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "secretKey": "sk_test_f075718722a05eb8182c77beb0279ebe1d2249d2",
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "publicKey": "pk_test_2d8c8cc28b9fe655ef88e292cf66c3e9cb7dff08"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     },
