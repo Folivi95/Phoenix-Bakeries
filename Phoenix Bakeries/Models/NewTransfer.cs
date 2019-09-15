@@ -14,11 +14,11 @@ namespace Phoenix_Bakeries.Models
         [StringLength(15)]
         public string Description { get; set; }
         [Required, StringLength(10)]
-        public int AccountNumber { get; set; }
+        public string AccountNumber { get; set; }
         [Display(Name = "Bank Name"), Required]
         public string BankCode { get; set; }
-        [Display(Name = "Amount")]
-        public int Amount { get; set; }
+
+        public decimal Amount { get; set; }
         public string Currency { get; set; }
     }
 }

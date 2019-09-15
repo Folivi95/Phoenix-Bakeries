@@ -15,17 +15,17 @@ namespace Phoenix_Bakeries.Controllers
     public class NewTransfersController : Controller
     {
         private readonly HttpClient client = new HttpClient();
-        List<BankList> banks = new List<BankList>();
+        private List<BankList> banks = new List<BankList>();
         private string AccountName = "";
         private string RecipientCode = "";
         private string TransferCode = "";
 
-        // GET: NewTransfers/Create
-        public async Task<IActionResult> Create()
+        // GET: NewTransfers/Index
+        public async Task<IActionResult> Index()
         {
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"{Environment.GetEnvironmentVariable("secretKey")}");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {Environment.GetEnvironmentVariable("secretKey")}");
             //get list of banks
             string responseData = await client.GetStringAsync("https://api.paystack.co/bank");
 
@@ -49,19 +49,19 @@ namespace Phoenix_Bakeries.Controllers
             return View();
         }
 
-        // POST: NewTransfers/Create
+        // POST: NewTransfers/Index
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Nuban,Description,AccountNumber,BankCode,Currency")] NewTransfer newTransfer)
+        public async Task<IActionResult> Index([Bind("ID,Nuban,Description,AccountNumber,BankCode,Currency")] NewTransfer newTransfer)
         {
             if (ModelState.IsValid)
             {
                 //validate account details
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"{Environment.GetEnvironmentVariable("secretKey")}");
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {Environment.GetEnvironmentVariable("secretKey")}");
 
                 string request = string.Format($"https://api.paystack.co/bank/resolve?account_number={newTransfer.AccountNumber}&bank_code={newTransfer.BankCode}");
 
@@ -79,7 +79,7 @@ namespace Phoenix_Bakeries.Controllers
                     else
                     {
                         TempData["AccountError"] = "Wrong Account Details... Please Reconfirm Account Details";
-                        return RedirectToPage("./Create");
+                        return RedirectToAction("Index");
                     }
                 }
                 catch (Exception ex)
@@ -105,7 +105,7 @@ namespace Phoenix_Bakeries.Controllers
                             //Transfer to Recipient
                             client.DefaultRequestHeaders.Accept.Clear();
                             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"{Environment.GetEnvironmentVariable("secretKey")}");
+                            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {Environment.GetEnvironmentVariable("secretKey")}");
                             string transferContent = $"{{\"source\":\"balance\",\"reason\":\"{newTransfer.Description}\",\"amount\":{newTransfer.Amount * 100},\"recipient\":\"{RecipientCode}\"}}";
                             HttpResponseMessage transferRes = await client.PostAsync("https://api.paystack.co/transfer", new StringContent(transferContent));
 
@@ -115,14 +115,14 @@ namespace Phoenix_Bakeries.Controllers
                                 NewTransferVM transCode = JsonConvert.DeserializeObject<NewTransferVM>(transCodeData);
                                 TransferCode = transCode.data[0].transfer_code;
                                 //provide placeholder values to View
-                                TempData["otpRequired"] = true;
+                                TempData["otpRequired"] = "yes";
                                 TempData["NameAcc"] = AccountName;
                                 TempData["Amount"] = newTransfer.Amount;
                                 TempData["Bank"] = ViewData["Banks"];
                                 TempData["NumberAcc"] = newTransfer.AccountNumber;
                                 TempData["TransCode"] = TransferCode;
                                 client.Dispose();
-                                return RedirectToPage("./Create");
+                                return View(newTransfer);
                             }
                         }
                         catch (Exception ex)
@@ -134,7 +134,7 @@ namespace Phoenix_Bakeries.Controllers
                     {
                         TempData["AccountError"] = "Error Occurred While Creating Recipient";
                         client.Dispose();
-                        return RedirectToPage("./Create");
+                        return RedirectToAction("Index");
                     }
                 }
                 catch (Exception ex)
@@ -143,26 +143,35 @@ namespace Phoenix_Bakeries.Controllers
                 }
 
             }
-            return View(newTransfer);
+            return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> CreateConfirmed([Bind("ID,Nuban,Description,AccountNumber,BankCode,Currency")] NewTransfer newTransfer, string otpValue, string transferCode)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> IndexConfirmed([Bind("ID,Nuban,Description,AccountNumber,BankCode,Currency")] NewTransfer newTransfer, string otpValue, string transferCode)
         {
             try
             {
                 //Finalize Transfer to Recipient
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"{Environment.GetEnvironmentVariable("secretKey")}");
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {Environment.GetEnvironmentVariable("secretKey")}");
                 string finalizeContent = $"{{\"transfer_code\":\"{transferCode}\",\"otp\":\"{otpValue}\"}}";
                 HttpResponseMessage finalizeRes = await client.PostAsync("https://api.paystack.co/transfer/finalize_transfer", new StringContent(finalizeContent));
+
+                if (finalizeRes.IsSuccessStatusCode)
+                {
+                    return View("Details");
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error Occurrred: {ex.Message}");
             }
-            
-            return View(nameof(Create), newTransfer);
+
+            //display error message
+            TempData["AccountError"] = "Transfer Failed... Please Try Again";
+            return RedirectToAction(nameof(Index));
         }
     }
 }
