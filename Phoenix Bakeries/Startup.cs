@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using Phoenix_Bakeries.Models;
 
 namespace Phoenix_Bakeries
 {
@@ -33,6 +35,9 @@ namespace Phoenix_Bakeries
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddDbContext<Phoenix_BakeriesContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("Phoenix_BakeriesContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
