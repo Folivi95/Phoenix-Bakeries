@@ -1,0 +1,43 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:52210",
+      "sslPort": 44307
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "secretKey": "sk_test_f075718722a05eb8182c77beb0279ebe1d2249d2",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "publicKey": "pk_test_2d8c8cc28b9fe655ef88e292cf66c3e9cb7dff08"
+      }
+    },
+    "Phoenix_Bakeries": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "environmentVariables": {
+        "secretKey": "sk_test_f075718722a05eb8182c77beb0279ebe1d2249d2",
+        "ASPNETCORE_URLS": "https://+:443;http://+:80",
+        "ASPNETCORE_HTTPS_PORT": "44308",
+        "publicKey": "pk_test_2d8c8cc28b9fe655ef88e292cf66c3e9cb7dff08"
+      },
+      "httpPort": 52215,
+      "useSSL": true,
+      "sslPort": 44308
+    }
+  }
+}
