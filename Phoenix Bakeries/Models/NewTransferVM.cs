@@ -9,7 +9,7 @@ namespace Phoenix_Bakeries.Models
     {
         public string status { get; set; }
         public string message { get; set; }
-        public List<TransferVM> data { get; set; }
+        public TransferVM data { get; set; }
     }
 
     public class TransferVM

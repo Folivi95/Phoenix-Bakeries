@@ -17,6 +17,8 @@ namespace Phoenix_Bakeries.Controllers
         private readonly HttpClient client = new HttpClient();
         private List<BankList> banks = new List<BankList>();
         private string AccountName = "";
+        private int Amount = 0;
+        private string postedBankName;
         private string RecipientCode = "";
         private string TransferCode = "";
 
@@ -54,10 +56,10 @@ namespace Phoenix_Bakeries.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([Bind("ID,Nuban,Description,AccountNumber,BankCode,Currency")] NewTransfer newTransfer)
+        public async Task<IActionResult> Index([Bind("ID,Nuban,Description,AccountNumber,Amount,BankCode,Currency")] NewTransfer newTransfer)
         {
             if (ModelState.IsValid)
-            {
+            {               
                 //validate account details
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -100,25 +102,27 @@ namespace Phoenix_Bakeries.Controllers
                         {
                             string recipientData = await recipientRes.Content.ReadAsStringAsync();
                             RecipientVM res = JsonConvert.DeserializeObject<RecipientVM>(recipientData);
-                            RecipientCode = res.recipient_code;
+                            RecipientCode = res.data.recipient_code;
+                            //client.Dispose(); 
 
                             //Transfer to Recipient
-                            client.DefaultRequestHeaders.Accept.Clear();
-                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                            client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {Environment.GetEnvironmentVariable("secretKey")}");
-                            string transferContent = $"{{\"source\":\"balance\",\"reason\":\"{newTransfer.Description}\",\"amount\":{newTransfer.Amount * 100},\"recipient\":\"{RecipientCode}\"}}";
+                            Amount = Convert.ToInt32(newTransfer.Amount);
+                            //client.DefaultRequestHeaders.Accept.Clear();
+                            //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                            //client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {Environment.GetEnvironmentVariable("secretKey")}");
+                            string transferContent = $"{{\"source\":\"balance\",\"reason\":\"{newTransfer.Description}\",\"amount\":{Amount * 100},\"recipient\":\"{RecipientCode}\"}}";
                             HttpResponseMessage transferRes = await client.PostAsync("https://api.paystack.co/transfer", new StringContent(transferContent));
 
                             if (transferRes.IsSuccessStatusCode)
                             {
-                                string transCodeData = await recipientRes.Content.ReadAsStringAsync();
+                                string transCodeData = await transferRes.Content.ReadAsStringAsync();
                                 NewTransferVM transCode = JsonConvert.DeserializeObject<NewTransferVM>(transCodeData);
-                                TransferCode = transCode.data[0].transfer_code;
+                                TransferCode = transCode.data.transfer_code;
                                 //provide placeholder values to View
                                 TempData["otpRequired"] = "yes";
                                 TempData["NameAcc"] = AccountName;
                                 TempData["Amount"] = newTransfer.Amount;
-                                TempData["Bank"] = ViewData["Banks"];
+                                TempData["Bank"] = res.data.details.bank_name;
                                 TempData["NumberAcc"] = newTransfer.AccountNumber;
                                 TempData["TransCode"] = TransferCode;
                                 client.Dispose();
