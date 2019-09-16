@@ -1,8 +1,17 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome To Phoenix Bakeries</h1>
+    
+
+    
+    <ul class="list-group">
+        <li class="list-group-item list-group-item-success"><p>Click <a asp-controller="Balance" asp-action="Index">here</a> to view balance on Paystack.</p></li>
+        <li class="list-group-item list-group-item-dark"><p>Make Transfers using the following steps:</p></li>
+        <li class="list-group-item list-group-item-secondary"><p>Transfer to New Beneficiaries by clicking <a asp-controller="NewTransfers" asp-action="Index">here</a></p></li>
+        @*<li class="list-group-item list-group-item-dark">Transfer After Adding Beneficiary by clicking <a asp-page="/Transfers/Create">here</a></li>*@
+        @*<li class="list-group-item list-group-item-dark">Click <a asp-controller="Transfers" asp-action="Index">here</a> to view transactions.</li>*@
+    </ul>
 </div>
